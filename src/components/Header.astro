@@ -120,13 +120,15 @@ const currentPath = Astro.url.pathname;
 	</nav>
 	<el-dialog>
 		<dialog id="mobile-menu" class="backdrop:bg-transparent lg:hidden">
+			<el-dialog-backdrop class="fixed inset-0 bg-black/30 transition duration-300 data-closed:opacity-0"
+			></el-dialog-backdrop>
 			<div tabindex="0" class="fixed inset-0 focus:outline-none">
 				<el-dialog-panel
-					class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10"
+					class="container fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 transition duration-300 ease-in-out data-closed:translate-x-full data-closed:opacity-0"
 				>
 					<div class="flex items-center justify-between">
 						<a href="#" class="-m-1.5 p-1.5">
-							<span class="sr-only">Your Company</span>
+							<span class="sr-only">{siteName}</span>
 							<img
 								src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
 								alt=""
