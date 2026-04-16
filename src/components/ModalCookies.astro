@@ -1,0 +1,99 @@
+---
+import { enableCookieModal } from "@/data/config";
+if (!enableCookieModal) return;
+
+import Button from "@/components/Button.astro";
+import LucideMessageCircleWarning from "~icons/lucide/message-circle-warning";
+import LucideCircleCheck from "~icons/lucide/circle-check";
+---
+
+<el-dialog id="cookie-modal">
+	<dialog
+		id="dialog"
+		aria-labelledby="dialog-title"
+		class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+	>
+		<el-dialog-backdrop
+			class="fixed inset-0 bg-brand-black/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+		></el-dialog-backdrop>
+
+		<div tabindex="0" class="flex min-h-full items-end sm:p-4 focus:outline-none">
+			<el-dialog-panel
+				class="relative transform bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+			>
+				<div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ring-1 ring-white">
+					<div class="sm:flex sm:items-start">
+						<div class="bg-gray-100 flex size-12 shrink-0 items-center justify-center rounded-full sm:size-10">
+							<LucideMessageCircleWarning class="size-6 text-brand-cornflower" />
+						</div>
+						<div class="mt-3 sm:mt-0 sm:ml-4 sm:text-left">
+							<h3 id="dialog-title" class="text-xl">We use cookies!</h3>
+							<div class="mt-2">
+								<p class="text-sm">
+									We use cookies to enhance your browsing experience and analyze our traffic. By
+									clicking "Accept", you consent to our use of cookies.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="bg-gray-100 px-4 py-3 flex flex-col gap-x-4 sm:flex-row-reverse sm:px-6">
+					<Button
+						class="max-sm:text-xl"
+						type="button"
+						command="close"
+						commandfor="dialog"
+						id="accept-cookies"
+					>
+						<LucideCircleCheck class="size-6" />
+						Accept
+					</Button>
+					<Button
+						class="text-sm"
+						variant="ghost"
+						type="button"
+						command="close"
+						commandfor="dialog"
+						id="refuse-cookies"
+					>
+						Refuse
+					</Button>
+				</div>
+			</el-dialog-panel>
+		</div>
+	</dialog>
+</el-dialog>
+
+<script>
+	const COOKIE_NAME = "cookie-consent";
+	const COOKIE_EXPIRY_DAYS = 30;
+
+	const getCookie = (name: string): string | null => {
+		const cookies = document.cookie.split("; ");
+		const cookie = cookies.find((c) => c.startsWith(`${name}=`));
+		return cookie ? decodeURIComponent(cookie.split("=")[1]) : null;
+	};
+
+	const setCookie = (name: string, value: string, days: number): void => {
+		const expires = new Date(Date.now() + days * 864e5).toUTCString();
+		const cookieString = `${encodeURIComponent(name)}=${encodeURIComponent(value)};expires=${expires};path=/;SameSite=Lax`;
+		Object.getOwnPropertyDescriptor(Document.prototype, "cookie")?.set?.call(document, cookieString);
+	};
+
+	const handleConsent = (accepted: boolean) =>
+		setCookie(COOKIE_NAME, accepted ? "accepted" : "refused", COOKIE_EXPIRY_DAYS);
+
+	// Initialize modal behavior
+	const modal = document.getElementById("cookie-modal") as HTMLElement & { open?: boolean };
+	if (getCookie(COOKIE_NAME)) {
+		modal?.remove();
+	} else {
+		modal.open = true;
+
+		// Prevent closing when clicking outside or pressing Escape
+		modal.addEventListener("cancel", (e) => e.preventDefault());
+
+		document.getElementById("accept-cookies")?.addEventListener("click", () => handleConsent(true));
+		document.getElementById("refuse-cookies")?.addEventListener("click", () => handleConsent(false));
+	}
+</script>

@@ -1,0 +1,63 @@
+---
+import "@/styles/global.css";
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import { siteName, themeColor, siteLang } from "@/data/config";
+import ModalCookies from "@/components/ModalCookies.astro";
+import type { LayoutProps as Props } from "@/types";
+
+const { title, seoTitle, seoDescription, noindex = false, ogImage } = Astro.props;
+
+// OG Image: Use provided image or fallback to default
+const ogImageUrl = ogImage || `${import.meta.env.SITE}/og-image.jpg`;
+
+// Add 'homepage' class to body on homepage
+const isHomepage = Astro.url.pathname === "/";
+---
+
+<!doctype html>
+<html lang={siteLang} data-theme="light">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={seoDescription} />
+		{noindex && <meta name="robots" content="noindex,nofollow" />}
+		<meta name="theme-color" content={themeColor} />
+
+		<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<meta name="apple-mobile-web-app-title" content={siteName} />
+		<link rel="manifest" href="/site.webmanifest" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+
+		<meta property="og:url" content={Astro.url} />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={seoTitle} />
+		<meta property="og:image" content={ogImageUrl} />
+		<meta property="og:description" content={seoDescription} />
+		<meta property="og:site_name" content={siteName} />
+		<meta property="og:locale" content={siteLang} />
+
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:url" content={Astro.url} />
+		<meta name="twitter:title" content={seoTitle} />
+		<meta name="twitter:description" content={seoDescription} />
+		<meta name="twitter:image" content={ogImageUrl} />
+
+		<slot name="head" />
+	</head>
+	<body class:list={[isHomepage && "homepage", "flex flex-col"]}>
+		<Header />
+		<main>
+			<slot />
+		</main>
+		<Footer />
+		<script>
+			import "@tailwindplus/elements";
+		</script>
+		<ModalCookies />
+	</body>
+</html>

@@ -1,0 +1,251 @@
+---
+import { twMerge } from "tailwind-merge";
+import { mainNav } from "../data/menus";
+import { siteName } from "@/data/config";
+import { popoverId, disclosureId, linkRel, isActive } from "@/utils/helpers";
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="bg-white">
+	<nav aria-label="Global" class="container flex items-center justify-between py-6">
+		<div class="flex lg:flex-1">
+			<a href="#" class="-m-1.5 p-1.5">
+				<span class="sr-only">{siteName}</span>
+				<img
+					src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+					alt=""
+					class="h-8 w-auto"
+				/>
+			</a>
+		</div>
+		<div class="flex lg:hidden">
+			<button
+				type="button"
+				command="show-modal"
+				commandfor="mobile-menu"
+				class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+			>
+				<span class="sr-only">Open main menu</span>
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.5"
+					data-slot="icon"
+					aria-hidden="true"
+					class="size-6"
+				>
+					<path
+						d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"></path>
+				</svg>
+			</button>
+		</div>
+		<el-popover-group class="hidden lg:flex lg:gap-x-12">
+			{
+				mainNav.map((item) =>
+					item.children ? (
+						<div class="relative">
+							<button
+								type="button"
+								popovertarget={popoverId(item)}
+								class={twMerge(
+									"flex items-center gap-x-1 text-sm/6 font-semibold",
+									item.class,
+									isActive(item, currentPath) && item.activeClass,
+								)}
+							>
+								{item.title}
+								<svg
+									viewBox="0 0 20 20"
+									fill="currentColor"
+									data-slot="icon"
+									aria-hidden="true"
+									class="size-5 flex-none text-gray-400"
+								>
+									<path
+										d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+										clip-rule="evenodd"
+										fill-rule="evenodd"
+									/>
+								</svg>
+							</button>
+
+							<el-popover
+								id={popoverId(item)}
+								anchor="bottom"
+								popover
+								class="w-screen max-w-xs overflow-hidden rounded-2xl bg-white shadow-lg outline-1 outline-gray-900/5 transition transition-discrete [--anchor-gap:--spacing(3)] backdrop:bg-transparent open:block data-closed:translate-y-1 data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-150 data-leave:ease-in"
+							>
+								<div class="p-2">
+									{item.children.map((child) => (
+										<a
+											href={child.href}
+											target={child.target}
+											rel={linkRel(child.target, child.rel)}
+											class={twMerge(
+												"block rounded-lg py-2 pr-3 pl-6 text-sm/7 font-semibold hover:bg-gray-50",
+												child.class,
+												isActive(child, currentPath) && child.activeClass,
+											)}
+										>
+											{child.title}
+										</a>
+									))}
+								</div>
+							</el-popover>
+						</div>
+					) : (
+						<a
+							href={item.href}
+							target={item.target}
+							rel={linkRel(item.target, item.rel)}
+							class={twMerge(
+								"text-sm/6 font-semibold",
+								item.class,
+								isActive(item, currentPath) && item.activeClass,
+							)}
+						>
+							{item.title}
+						</a>
+					),
+				)
+			}
+		</el-popover-group>
+		<div class="hidden lg:flex lg:flex-1 lg:justify-end">
+			<a href="#" class="text-sm/6 font-semibold">Log in <span aria-hidden="true">&rarr;</span></a>
+		</div>
+	</nav>
+	<el-dialog>
+		<dialog id="mobile-menu" class="backdrop:bg-transparent lg:hidden">
+			<div tabindex="0" class="fixed inset-0 focus:outline-none">
+				<el-dialog-panel
+					class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10"
+				>
+					<div class="flex items-center justify-between">
+						<a href="#" class="-m-1.5 p-1.5">
+							<span class="sr-only">Your Company</span>
+							<img
+								src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+								alt=""
+								class="h-8 w-auto"
+							/>
+						</a>
+						<button
+							type="button"
+							command="close"
+							commandfor="mobile-menu"
+							class="-m-2.5 rounded-md p-2.5 text-gray-700"
+						>
+							<span class="sr-only">Close menu</span>
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								data-slot="icon"
+								aria-hidden="true"
+								class="size-6"
+							>
+								<path d="M6 18 18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
+							</svg>
+						</button>
+					</div>
+					<div class="mt-6 flow-root">
+						<div class="-my-6 divide-y divide-gray-500/10">
+							<div class="space-y-2 py-6">
+								{
+									mainNav.map((item) =>
+										item.children ? (
+											<div class="-mx-3">
+												<button
+													type="button"
+													command="--toggle"
+													commandfor={disclosureId(item)}
+													class={twMerge(
+														"flex w-full items-center justify-between rounded-lg py-2 pr-3.5 pl-3 text-base/7 font-semibold hover:bg-gray-50",
+														item.class,
+														isActive(item, currentPath) && item.activeClass,
+													)}
+												>
+													{item.title}
+													<svg
+														viewBox="0 0 20 20"
+														fill="currentColor"
+														data-slot="icon"
+														aria-hidden="true"
+														class="size-5 flex-none in-aria-expanded:rotate-180"
+													>
+														<path
+															d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+															clip-rule="evenodd"
+															fill-rule="evenodd"
+														/>
+													</svg>
+												</button>
+												<el-disclosure
+													id={disclosureId(item)}
+													hidden
+													class="mt-2 block space-y-2"
+												>
+													{item.children.map((child) => (
+														<a
+															href={child.href}
+															target={child.target}
+															rel={linkRel(child.target, child.rel)}
+															class={twMerge(
+																"block rounded-lg py-2 pr-3 pl-6 text-sm/7 font-semibold hover:bg-gray-50",
+																child.class,
+																isActive(child, currentPath) && child.activeClass,
+															)}
+														>
+															{child.title}
+														</a>
+													))}
+												</el-disclosure>
+											</div>
+										) : (
+											<a
+												href={item.href}
+												target={item.target}
+												rel={linkRel(item.target, item.rel)}
+												class={twMerge(
+													"-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold hover:bg-gray-50",
+													item.class,
+													isActive(item, currentPath) && item.activeClass,
+												)}
+											>
+												{item.title}
+											</a>
+										),
+									)
+								}
+							</div>
+							<div class="py-6">
+								<a
+									href="#"
+									class="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold hover:bg-gray-50"
+									>Log in</a
+								>
+							</div>
+						</div>
+					</div>
+				</el-dialog-panel>
+			</div>
+		</dialog>
+	</el-dialog>
+</header>
+<script>
+	document.addEventListener("pointerdown", (event) => {
+		for (const popover of document.querySelectorAll("el-popover[popover]")) {
+			if (
+				!popover.contains(event.target as Node) &&
+				!popover.previousElementSibling?.contains(event.target as Node)
+			) {
+				(popover as HTMLElement).hidePopover();
+			}
+		}
+	});
+</script>

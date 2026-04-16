@@ -1,0 +1,9 @@
+---
+import type { ContainerProps as Props } from "@/types";
+const { class: className = "", contain = true, ...props } = Astro.props;
+const classes = `${contain ? "container" : ""} ${contain ? "py-16 lg:py-12" : ""} ${className}`;
+---
+
+<div class={classes} {...props}>
+    <slot />
+</div>
